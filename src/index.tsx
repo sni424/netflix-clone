@@ -7,7 +7,10 @@ import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 import { ThemeProvider } from "styled-components";
 import { theme } from "./utils/theme";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { GlobalStyle } from "./utils/GlobalStyled";
+
+const client = new QueryClient();
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement
@@ -16,10 +19,12 @@ root.render(
     <React.StrictMode>
         <BrowserRouter>
             <RecoilRoot>
-                <ThemeProvider theme={theme}>
-                    <GlobalStyle />
-                    <App />
-                </ThemeProvider>
+                <QueryClientProvider client={client}>
+                    <ThemeProvider theme={theme}>
+                        <GlobalStyle />
+                        <App />
+                    </ThemeProvider>
+                </QueryClientProvider>
             </RecoilRoot>
         </BrowserRouter>
     </React.StrictMode>
