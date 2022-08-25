@@ -1,4 +1,5 @@
-import React from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult } from "../api";
@@ -36,11 +37,67 @@ const Overview = styled.p`
     width: 50%;
 `;
 
+const Slider = styled.div`
+    position: relative;
+    top: -100px;
+    width: 100%;
+`;
+
+const Row = styled(motion.div)`
+    display: grid;
+    gap: 5px;
+    grid-template-columns: repeat(6, 1fr);
+    position: absolute;
+    width: 95%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+`;
+
+const Box = styled(motion.div)<{ bgPhoto: string }>`
+    background-color: white;
+    height: 200px;
+    color: red;
+    font-size: 18px;
+    background-image: url(${(props) => props.bgPhoto});
+    background-position: center center;
+    background-size: cover;
+`;
+
+const rowVariants = {
+    hidden: {
+        x: window.outerWidth + 5,
+    },
+    visible: {
+        x: 0,
+    },
+    exit: {
+        x: -window.outerWidth - 5,
+    },
+};
+
+const offset = 6;
+
 const Home = () => {
     const { data, isLoading } = useQuery<IGetMoviesResult>(
         ["movies", "noewPlaying"],
         getMovies
     );
+
+    const [index, setIndex] = useState(0);
+    const [leaving, setLeaving] = useState(false);
+    const incraseIndex = () => {
+        if (data) {
+            if (leaving) return;
+            toggleLeaving();
+            const totalMovies = data?.results.length - 1;
+            const maxIndex = Math.floor(totalMovies / offset) - 1;
+            setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+        }
+    };
+    const toggleLeaving = () => {
+        setLeaving(!leaving);
+    };
 
     return (
         <Wrapper style={{ height: "150vh" }}>
@@ -49,6 +106,7 @@ const Home = () => {
             ) : (
                 <>
                     <Banner
+                        onClick={incraseIndex}
                         bgPhoto={makeImagePath(
                             data?.results[0].backdrop_path || ""
                         )}
@@ -56,6 +114,39 @@ const Home = () => {
                         <Title>{data?.results[0].title}</Title>
                         <Overview>{data?.results[0].overview}</Overview>
                     </Banner>
+                    <Slider>
+                        <AnimatePresence
+                            initial={false}
+                            onExitComplete={toggleLeaving}
+                        >
+                            <Row
+                                variants={rowVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
+                                transition={{ type: "tween", duration: 0.8 }}
+                                key={index}
+                            >
+                                {data?.results
+                                    .slice(1)
+                                    .slice(
+                                        offset * index,
+                                        offset * index + offset
+                                    )
+                                    .map((movie) => {
+                                        return (
+                                            <Box
+                                                key={movie.id}
+                                                bgPhoto={makeImagePath(
+                                                    movie.backdrop_path,
+                                                    "w500"
+                                                )}
+                                            />
+                                        );
+                                    })}
+                            </Row>
+                        </AnimatePresence>
+                    </Slider>
                 </>
             )}
         </Wrapper>
