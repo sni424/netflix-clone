@@ -1,16 +1,16 @@
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, useAnimation, useScroll } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
+import { idText } from "typescript";
 
-const Nav = styled.nav`
+const Nav = styled(motion.nav)`
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: fixed;
     width: 100%;
     top: 0;
-    background-color: black;
     font-size: 14px;
     padding: 20px 60px;
     color: white;
@@ -94,15 +94,44 @@ const logoVariants = {
     },
 };
 
+const navVariants = {
+    top: { backgroundColor: "rgba(0,0,0,0)" },
+    down: {
+        backgroundColor: "rgba(0,0,0,1)",
+    },
+};
+
 const Header = () => {
     const [searchOpen, setSearchOpen] = useState(false);
     const homeMatch = useMatch("/");
     const tvMatch = useMatch("tv");
+    const inputAnimation = useAnimation();
+    const { scrollY } = useScroll();
+    const navAnimation = useAnimation();
 
-    const openSearch = () => setSearchOpen(!searchOpen);
+    const openSearch = () => {
+        if (searchOpen) {
+            inputAnimation.start({
+                scaleX: 0,
+            });
+        } else {
+            inputAnimation.start({ scaleX: 1 });
+        }
+        setSearchOpen(!searchOpen);
+    };
+
+    useEffect(() => {
+        scrollY.onChange(() => {
+            if (scrollY.get() > 10) {
+                navAnimation.start("down");
+            } else {
+                navAnimation.start("top");
+            }
+        });
+    }, [scrollY, navAnimation]);
 
     return (
-        <Nav>
+        <Nav variants={navVariants} animate={navAnimation} initial="top">
             <Col right="0">
                 <Logo
                     variants={logoVariants}
@@ -145,10 +174,7 @@ const Header = () => {
                         ></path>
                     </motion.svg>
                     <Input
-                        animate={{
-                            scaleX: searchOpen ? 1 : 0,
-                            transition: { duration: 0.5 },
-                        }}
+                        animate={inputAnimation}
                         placeholder="Video Name is Here"
                     />
                 </Search>
