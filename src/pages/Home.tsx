@@ -7,6 +7,7 @@ import { makeImagePath } from "../utils/Path";
 
 const Wrapper = styled.div`
     background-color: black;
+    overflow-x: hidden;
 `;
 
 const Loader = styled.div`
@@ -57,11 +58,29 @@ const Row = styled(motion.div)`
 const Box = styled(motion.div)<{ bgPhoto: string }>`
     background-color: white;
     height: 200px;
-    color: red;
     font-size: 18px;
     background-image: url(${(props) => props.bgPhoto});
     background-position: center center;
     background-size: cover;
+    &:first-child {
+        transform-origin: center left;
+    }
+    &:last-child {
+        transform-origin: center right;
+    }
+`;
+
+const InFo = styled(motion.div)`
+    padding: 20px;
+    background-color: ${(props) => props.theme.black.lighter};
+    opacity: 0;
+    width: 85%;
+    position: absolute;
+    bottom: 0;
+    h4 {
+        text-align: center;
+        font-size: 18px;
+    }
 `;
 
 const rowVariants = {
@@ -73,6 +92,24 @@ const rowVariants = {
     },
     exit: {
         x: -window.outerWidth - 5,
+    },
+};
+
+const BoxBariants = {
+    normal: {
+        scale: 1,
+    },
+    hover: {
+        scale: 1.2,
+        y: -50,
+        transition: { delay: 0.5, type: "tween", duration: 0.3 },
+    },
+};
+
+const infoVariants = {
+    hover: {
+        opacity: 1,
+        transition: { delay: 0.5, type: "tween", duration: 0.3 },
     },
 };
 
@@ -136,12 +173,23 @@ const Home = () => {
                                     .map((movie) => {
                                         return (
                                             <Box
+                                                variants={BoxBariants}
                                                 key={movie.id}
+                                                initial="normal"
+                                                whileHover="hover"
+                                                transition={{
+                                                    type: "tween",
+                                                }}
                                                 bgPhoto={makeImagePath(
-                                                    movie.backdrop_path,
+                                                    movie.backdrop_path ||
+                                                        movie.poster_path,
                                                     "w500"
                                                 )}
-                                            />
+                                            >
+                                                <InFo variants={infoVariants}>
+                                                    <h4>{movie.title}</h4>
+                                                </InFo>
+                                            </Box>
                                         );
                                     })}
                             </Row>
