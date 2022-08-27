@@ -19,8 +19,27 @@ export interface IGetMoviesResult {
     total_results: number;
 }
 
+export interface IGetTopMoviesResult {
+    page: number;
+    results: IMovie[];
+    total_pages: number;
+    total_results: number;
+}
+
 export const getMovies = async () => {
     return await axios
         .get(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`)
+        .then((res) => res.data);
+};
+
+export const getTopMovies = async () => {
+    return await axios
+        .get(`${BASE_PATH}/movie/top_rated?api_key=${API_KEY}`)
+        .then((res) => res.data);
+};
+
+export const getPopularMovies = async () => {
+    return await axios
+        .get(`${BASE_PATH}/movie/popular?api_key=${API_KEY}`)
         .then((res) => res.data);
 };

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { v4 as uuidv4 } from "uuid";
-import { makeImagePath } from "../../utils/Path";
+import { makeImagePath } from "../../../utils/Path";
 
 const SliderDiv = styled.div`
     position: relative;
@@ -139,7 +139,7 @@ interface IMovie {
     overview: string;
 }
 
-const SliderComponent = ({ data }: any) => {
+const Popular = ({ popDatas }: any) => {
     const navi = useNavigate();
 
     const [leaving, setLeaving] = useState(false);
@@ -160,11 +160,11 @@ const SliderComponent = ({ data }: any) => {
         navi("/");
     };
 
-    console.log(data);
+    console.log(popDatas);
 
     const clickedMovie =
         bigMovieMatch?.params.movieId &&
-        data?.results.find(
+        popDatas?.results.find(
             (movie: IMovie) => String(movie.id) === bigMovieMatch.params.movieId
         );
 
@@ -181,7 +181,7 @@ const SliderComponent = ({ data }: any) => {
                         transition={{ type: "tween", duration: 0.8 }}
                         key={index}
                     >
-                        {data?.results
+                        {popDatas?.results
                             .slice(1)
                             .slice(offset * index, offset * index + offset)
                             .map((movie: IMovie) => {
@@ -248,4 +248,4 @@ const SliderComponent = ({ data }: any) => {
     );
 };
 
-export default SliderComponent;
+export default Popular;
