@@ -1,6 +1,7 @@
 import { motion, useAnimation, useScroll } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Link, useMatch } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { idText } from "typescript";
 
@@ -68,7 +69,7 @@ const Circle = styled(motion.span)`
     background-color: ${(props) => props.theme.red};
 `;
 
-const Search = styled.span`
+const Search = styled.form`
     cursor: pointer;
     color: white;
     svg {
@@ -101,6 +102,10 @@ const navVariants = {
     },
 };
 
+interface IForm {
+    keyword: string;
+}
+
 const Header = () => {
     const [searchOpen, setSearchOpen] = useState(false);
     const homeMatch = useMatch("/");
@@ -108,6 +113,8 @@ const Header = () => {
     const inputAnimation = useAnimation();
     const { scrollY } = useScroll();
     const navAnimation = useAnimation();
+    const { register, handleSubmit } = useForm<IForm>();
+    const navi = useNavigate();
 
     const openSearch = () => {
         if (searchOpen) {
@@ -118,6 +125,10 @@ const Header = () => {
             inputAnimation.start({ scaleX: 1 });
         }
         setSearchOpen(!searchOpen);
+    };
+
+    const onValid = (data: IForm) => {
+        navi(`/search?keyword=${data.keyword}`);
     };
 
     useEffect(() => {
@@ -156,7 +167,7 @@ const Header = () => {
                 </Items>
             </Col>
             <Col right="10rem">
-                <Search onClick={openSearch}>
+                <Search onSubmit={handleSubmit(onValid)} onClick={openSearch}>
                     <motion.svg
                         animate={{
                             x: searchOpen ? -210 : 0,
@@ -174,6 +185,10 @@ const Header = () => {
                         ></path>
                     </motion.svg>
                     <Input
+                        {...register("keyword", {
+                            required: true,
+                            minLength: 2,
+                        })}
                         animate={inputAnimation}
                         placeholder="Video Name is Here"
                     />

@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getMovies, IGetMoviesResult } from "../api";
+import SliderComponent from "../Component/Slide";
 import { makeImagePath } from "../utils/Path";
 
 const Wrapper = styled.div`
@@ -210,88 +211,7 @@ const Home = () => {
                         <Title>{data?.results[0].title}</Title>
                         <Overview>{data?.results[0].overview}</Overview>
                     </Banner>
-                    <Slider>
-                        <AnimatePresence
-                            initial={false}
-                            onExitComplete={toggleLeaving}
-                        >
-                            <Row
-                                variants={rowVariants}
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit"
-                                transition={{ type: "tween", duration: 0.8 }}
-                                key={index}
-                            >
-                                {data?.results
-                                    .slice(1)
-                                    .slice(
-                                        offset * index,
-                                        offset * index + offset
-                                    )
-                                    .map((movie) => {
-                                        return (
-                                            <Box
-                                                layoutId={movie.id + ""}
-                                                onClick={() =>
-                                                    boxClicked(movie.id)
-                                                }
-                                                variants={BoxBariants}
-                                                key={movie.id}
-                                                initial="normal"
-                                                whileHover="hover"
-                                                transition={{
-                                                    type: "tween",
-                                                }}
-                                                bgPhoto={makeImagePath(
-                                                    movie.backdrop_path ||
-                                                        movie.poster_path,
-                                                    "w500"
-                                                )}
-                                            >
-                                                <InFo variants={infoVariants}>
-                                                    <h4>{movie.title}</h4>
-                                                </InFo>
-                                            </Box>
-                                        );
-                                    })}
-                            </Row>
-                        </AnimatePresence>
-                    </Slider>
-                    <AnimatePresence>
-                        {bigMovieMatch ? (
-                            <>
-                                <Overlay
-                                    onClick={onOverlayClick}
-                                    exit={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                />
-                                <BigMovie
-                                    style={{ top: scrollY.get() + 100 }}
-                                    layoutId={bigMovieMatch.params.movieId}
-                                >
-                                    {clickedMovie && (
-                                        <>
-                                            <BigCover
-                                                style={{
-                                                    backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                                                        clickedMovie.backdrop_path,
-                                                        "original"
-                                                    )})`,
-                                                }}
-                                            />
-                                            <BigTitle>
-                                                {clickedMovie.title}
-                                            </BigTitle>
-                                            <BigOverview>
-                                                {clickedMovie.overview}
-                                            </BigOverview>
-                                        </>
-                                    )}
-                                </BigMovie>
-                            </>
-                        ) : null}
-                    </AnimatePresence>
+                    <SliderComponent data={data} />
                 </>
             )}
         </Wrapper>
