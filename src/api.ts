@@ -26,20 +26,15 @@ export interface IGetTopMoviesResult {
     total_results: number;
 }
 
-export const getMovies = async () => {
+export const getMovies = async (type: string) => {
     return await axios
-        .get(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`)
+        .get(`${BASE_PATH}/movie/${type}?api_key=${API_KEY}`)
         .then((res) => res.data);
 };
 
-export const getTopMovies = async () => {
-    return await axios
-        .get(`${BASE_PATH}/movie/top_rated?api_key=${API_KEY}`)
-        .then((res) => res.data);
-};
-
-export const getPopularMovies = async () => {
-    return await axios
-        .get(`${BASE_PATH}/movie/popular?api_key=${API_KEY}`)
-        .then((res) => res.data);
-};
+export enum Types {
+    "now_playing" = "now_playing",
+    "popular" = "popular",
+    "top_rated" = "top_rated",
+    "upcoming" = "upcoming",
+}
