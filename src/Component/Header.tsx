@@ -134,9 +134,13 @@ const Header = () => {
 
     useEffect(() => {
         scrollY.onChange(() => {
-            console.log(scrollY.get());
+            if (scrollY.get() > 10) {
+                navAnimation.start("down");
+            } else {
+                navAnimation.start("top");
+            }
         });
-    }, [scrollY]);
+    }, [scrollY, navAnimation]);
     return (
         <Nav variants={navVariants} animate={navAnimation} initial="top">
             <Col right="0">
