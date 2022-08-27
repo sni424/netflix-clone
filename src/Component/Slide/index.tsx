@@ -21,7 +21,7 @@ const SliderDiv = styled.div`
 
 const Button = styled.div<{ right?: string }>`
     position: absolute;
-    z-index: 99;
+    z-index: 4;
     right: ${(props) => props.right};
     width: 5rem;
     background-color: black;
@@ -96,20 +96,23 @@ const BigCover = styled.img`
     background-size: cover;
     background-position: center center;
     height: 400px;
+    position: relative;
 `;
 
 const BigTitle = styled.h3`
     color: ${(props) => props.theme.white.lighter};
     padding: 20px;
-    font-size: 46px;
-    position: relative;
-    top: -80px;
+    font-size: 45px;
+    position: absolute;
+    top: 15rem;
+    font-weight: 600;
+    height: 100px;
+    overflow: hidden;
 `;
 
 const BigOverview = styled.p`
     padding: 20px;
     position: relative;
-    top: -80px;
     color: ${(props) => props.theme.white.lighter};
 `;
 
@@ -228,6 +231,8 @@ const SliderComponent = ({ type }: { type: string }) => {
         data?.results.find(
             (movie) => String(movie.id) === bigMovieMatch.params.movieId
         );
+
+    console.log(clickedMovie);
 
     return (
         <>
