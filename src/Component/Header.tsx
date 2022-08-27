@@ -15,6 +15,7 @@ const Nav = styled(motion.nav)`
     font-size: 14px;
     padding: 20px 60px;
     color: white;
+    z-index: 5;
 `;
 
 interface Props {
@@ -133,21 +134,16 @@ const Header = () => {
 
     useEffect(() => {
         scrollY.onChange(() => {
-            if (scrollY.get() > 10) {
-                navAnimation.start("down");
-            } else {
-                navAnimation.start("top");
-            }
+            console.log(scrollY.get());
         });
-    }, [scrollY, navAnimation]);
-
+    }, [scrollY]);
     return (
         <Nav variants={navVariants} animate={navAnimation} initial="top">
             <Col right="0">
                 <Logo
                     variants={logoVariants}
                     whileHover="active"
-                    initial="normal"
+                    animate="normal"
                     xmlns="http://www.w3.org/2000/svg"
                     width="1024"
                     height="276.742"

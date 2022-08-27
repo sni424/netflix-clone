@@ -18,7 +18,7 @@ const Loader = styled.div`
 `;
 
 const Banner = styled.div<{ bgPhoto: string }>`
-    height: 100vh;
+    height: 80vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -51,7 +51,7 @@ const Home = () => {
     );
 
     return (
-        <Wrapper style={{ height: "150vh" }}>
+        <Wrapper>
             {isLoading ? (
                 <Loader>Loading...</Loader>
             ) : (
