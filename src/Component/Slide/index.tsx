@@ -1,8 +1,13 @@
 import { AnimatePresence, motion, useScroll } from "framer-motion";
 import { useState } from "react";
-import { PathMatch, useMatch, useNavigate } from "react-router-dom";
+import { useQuery } from "react-query";
+import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { v4 as uuidv4 } from "uuid";
+import {
+    IoChevronBackCircleOutline,
+    IoChevronForwardCircleOutline,
+} from "react-icons/io5";
+import { getMovies, IGetMoviesResult } from "../../api";
 import { makeImagePath } from "../../utils/Path";
 
 const SliderDiv = styled.div`
@@ -14,10 +19,15 @@ const SliderDiv = styled.div`
     justify-content: space-between;
 `;
 
-const Button = styled.button<{ right?: string }>`
+const Button = styled.div<{ right?: string }>`
     position: absolute;
     z-index: 99;
     right: ${(props) => props.right};
+    width: 5rem;
+    background-color: black;
+    opacity: 0.5;
+    border-radius: 5rem;
+    cursor: pointer;
 `;
 
 const Row = styled(motion.div)`
@@ -67,8 +77,10 @@ const Overlay = styled(motion.div)`
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     opacity: 0;
+    z-index: 1;
 `;
-const BigMovie = styled(motion.div)`
+const BigMovie = styled(motion.div)<{ scrollY: number }>`
+    top: ${(props) => props.scrollY + 75}px;
     width: 40vw;
     height: 80vh;
     left: 0;
@@ -76,6 +88,7 @@ const BigMovie = styled(motion.div)`
     margin: 0 auto;
     position: absolute;
     background-color: ${(props) => props.theme.black.lighter};
+    z-index: 2;
 `;
 
 const BigCover = styled.img`
@@ -100,6 +113,13 @@ const BigOverview = styled.p`
     color: ${(props) => props.theme.white.lighter};
 `;
 
+const Category = styled.div`
+    position: absolute;
+    margin-top: -20rem;
+    font-size: 2rem;
+    font-weight: 800;
+`;
+
 const rowVariants = {
     hidden: {
         x: window.outerWidth + 5,
@@ -116,16 +136,25 @@ const BoxBariants = {
         scale: 1,
     },
     hover: {
-        scale: 1.2,
+        scale: 1.3,
         y: -50,
-        transition: { delay: 0.5, type: "tween", duration: 0.3 },
+        transition: {
+            delay: 0.5,
+            duration: 0.3,
+            type: "tween",
+        },
     },
 };
 
 const infoVariants = {
     hover: {
+        transition: {
+            delay: 0.5,
+            duration: 0.3,
+            type: "tween",
+        },
         opacity: 1,
-        transition: { delay: 0.5, type: "tween", duration: 0.3 },
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
     },
 };
 
@@ -139,47 +168,82 @@ interface IMovie {
     overview: string;
 }
 
-const SliderComponent = ({ data }: any) => {
+const SliderComponent = ({ type }: { type: string }) => {
+    const { data, isLoading } = useQuery<IGetMoviesResult>(
+        ["movies", type],
+        () => getMovies(type)
+    );
     const navi = useNavigate();
 
     const [leaving, setLeaving] = useState(false);
     const [index, setIndex] = useState(0);
     const { scrollY } = useScroll();
 
-    const bigMovieMatch: PathMatch<string> | null =
-        useMatch("/movies/:movieId");
+    const bigMovieMatch = useMatch(`/movies/${type}/:movieId`);
 
-    const toggleLeaving = () => {
-        setLeaving(!leaving);
-    };
-
-    const boxClicked = (movieId: number) => {
-        navi(`/movies/${movieId}`);
+    const boxClicked = (category: string, movieId: number) => {
+        navi(`/movies/${category}/${movieId}`);
     };
     const onOverlayClick = () => {
         navi("/");
     };
 
-    console.log(data);
+    const incraseIndex = () => {
+        if (data) {
+            if (leaving) return;
+            toggleLeaving();
+            const totalMovies = data?.results.length - 1;
+            const maxIndex = Math.floor(totalMovies / offset) - 1;
+            setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
+        }
+    };
+
+    const decraseIndex = () => {
+        if (data) {
+            if (leaving) return;
+            toggleLeaving();
+            const totalMovies = data?.results.length - 1;
+            setIndex((prev) => (prev === 0 ? 2 : prev - 1));
+        }
+    };
+    const toggleLeaving = () => {
+        setLeaving(!leaving);
+    };
+
+    const switchCategory = () => {
+        switch (type) {
+            case "popular":
+                return "현재 많은사람들이 보고있는 인기있는 영화";
+            case "top_rated":
+                return "모두가 극찬한 최고평점 영화";
+            case "upcoming":
+                return "개봉 예정작";
+            default:
+                return "현재 상영중";
+        }
+    };
 
     const clickedMovie =
         bigMovieMatch?.params.movieId &&
         data?.results.find(
-            (movie: IMovie) => String(movie.id) === bigMovieMatch.params.movieId
+            (movie) => String(movie.id) === bigMovieMatch.params.movieId
         );
 
     return (
         <>
             <SliderDiv>
+                <Category>{switchCategory()}</Category>
                 <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                    <Button>left</Button>
+                    <Button onClick={incraseIndex}>
+                        <IoChevronBackCircleOutline size="100%" />
+                    </Button>
                     <Row
                         variants={rowVariants}
                         initial="hidden"
                         animate="visible"
                         exit="exit"
                         transition={{ type: "tween", duration: 0.8 }}
-                        key={index}
+                        key={type + index}
                     >
                         {data?.results
                             .slice(1)
@@ -187,10 +251,12 @@ const SliderComponent = ({ data }: any) => {
                             .map((movie: IMovie) => {
                                 return (
                                     <Box
-                                        layoutId={movie.id + ""}
-                                        onClick={() => boxClicked(movie.id)}
+                                        layoutId={type + movie.id + ""}
+                                        onClick={() =>
+                                            boxClicked(type, movie.id)
+                                        }
                                         variants={BoxBariants}
-                                        key={movie.id}
+                                        key={type + movie.id}
                                         initial="normal"
                                         whileHover="hover"
                                         transition={{
@@ -209,7 +275,9 @@ const SliderComponent = ({ data }: any) => {
                                 );
                             })}
                     </Row>
-                    <Button right="0">right</Button>
+                    <Button onClick={decraseIndex} right="0">
+                        <IoChevronForwardCircleOutline size="100%" />
+                    </Button>
                 </AnimatePresence>
             </SliderDiv>
             <AnimatePresence>
@@ -221,8 +289,8 @@ const SliderComponent = ({ data }: any) => {
                             animate={{ opacity: 1 }}
                         />
                         <BigMovie
-                            style={{ top: scrollY.get() + 100 }}
-                            layoutId={bigMovieMatch.params.movieId}
+                            scrollY={scrollY.get()}
+                            layoutId={type + bigMovieMatch.params.movieId}
                         >
                             {clickedMovie && (
                                 <>

@@ -1,14 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import {
-    getMovies,
-    getPopularMovies,
-    getTopMovies,
-    IGetMoviesResult,
-} from "../api";
+import { getMovies, IGetMoviesResult, Types } from "../api";
 import SliderComponent from "../Component/Slide";
-import Popular from "../Component/Slide/Popular";
 import { makeImagePath } from "../utils/Path";
 
 const Wrapper = styled.div`
@@ -35,7 +29,7 @@ const Banner = styled.div<{ bgPhoto: string }>`
 `;
 
 const MarginBottomDiv = styled.div`
-    margin-bottom: 20rem;
+    margin-bottom: 25rem;
 `;
 
 const Title = styled.h2`
@@ -51,54 +45,35 @@ const Overview = styled.p`
 const offset = 6;
 
 const Home = () => {
-    const { data: moviesData, isLoading: moviesLoding } =
-        useQuery<IGetMoviesResult>(["movies", "nowPlaying"], getMovies);
-
-    const { data: topMoviesData, isLoading: topLoding } =
-        useQuery<IGetMoviesResult>(["movies", "topPlaying"], getTopMovies);
-
-    const { data: popularMovies, isLoading: newLoding } =
-        useQuery<IGetMoviesResult>(["movies", "newPlaying"], getPopularMovies);
-
-    const [index, setIndex] = useState(0);
-    const [leaving, setLeaving] = useState(false);
-    const incraseIndex = () => {
-        if (moviesData) {
-            if (leaving) return;
-            toggleLeaving();
-            const totalMovies = moviesData?.results.length - 1;
-            const maxIndex = Math.floor(totalMovies / offset) - 1;
-            setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-        }
-    };
-    const toggleLeaving = () => {
-        setLeaving(!leaving);
-    };
+    const { data, isLoading } = useQuery<IGetMoviesResult>(
+        ["movies", "nowPlaying"],
+        () => getMovies(Types.now_playing)
+    );
 
     return (
         <Wrapper style={{ height: "150vh" }}>
-            {moviesLoding && newLoding ? (
+            {isLoading ? (
                 <Loader>Loading...</Loader>
             ) : (
                 <>
                     <Banner
-                        onClick={incraseIndex}
+                        // onClick={incraseIndex}
                         bgPhoto={makeImagePath(
-                            moviesData?.results[0].backdrop_path || ""
+                            data?.results[0].backdrop_path || ""
                         )}
                     >
-                        <Title>{moviesData?.results[0].title}</Title>
-                        <Overview>{moviesData?.results[0].overview}</Overview>
+                        <Title>{data?.results[0].title}</Title>
+                        <Overview>{data?.results[0].overview}</Overview>
                     </Banner>
-                    <MarginBottomDiv>
-                        <SliderComponent data={moviesData} />
-                    </MarginBottomDiv>
-                    <MarginBottomDiv>
-                        <SliderComponent data={topMoviesData} />
-                    </MarginBottomDiv>
-                    <MarginBottomDiv>
-                        <Popular popDatas={popularMovies} />
-                    </MarginBottomDiv>
+                    {["now_playing", "popular", "top_rated", "upcoming"].map(
+                        (category) => {
+                            return (
+                                <MarginBottomDiv>
+                                    <SliderComponent type={category} />
+                                </MarginBottomDiv>
+                            );
+                        }
+                    )}
                 </>
             )}
         </Wrapper>
