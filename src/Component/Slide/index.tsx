@@ -9,6 +9,8 @@ import {
 } from "react-icons/io5";
 import { getMovies, IGetMoviesResult } from "../../api";
 import { makeImagePath } from "../../utils/Path";
+import adultImg from "../../img/adult.png";
+import notAdultImg from "../../img/All.png";
 
 const SliderDiv = styled.div`
     position: relative;
@@ -89,14 +91,17 @@ const BigMovie = styled(motion.div)<{ scrollY: number }>`
     position: absolute;
     background-color: ${(props) => props.theme.black.lighter};
     z-index: 2;
+    border-radius: 1rem;
 `;
 
-const BigCover = styled.img`
+const BigCover = styled.div`
     width: 100%;
     background-size: cover;
     background-position: center center;
     height: 400px;
     position: relative;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
 `;
 
 const BigTitle = styled.h3`
@@ -104,16 +109,23 @@ const BigTitle = styled.h3`
     padding: 20px;
     font-size: 45px;
     position: absolute;
-    top: 15rem;
+    bottom: 0;
     font-weight: 600;
-    height: 100px;
     overflow: hidden;
 `;
 
-const BigOverview = styled.p`
+const BottonBox = styled.div`
     padding: 20px;
+    margin: 0 auto;
+    height: 30%;
+    overflow-y: auto;
+`;
+
+const BigOverview = styled.p`
     position: relative;
     color: ${(props) => props.theme.white.lighter};
+    font-weight: 500;
+    font-size: 1.1rem;
 `;
 
 const Category = styled.div`
@@ -121,6 +133,33 @@ const Category = styled.div`
     margin-top: -20rem;
     font-size: 2rem;
     font-weight: 800;
+`;
+
+const OpenDay = styled.div`
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+`;
+
+const Vote = styled.div`
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+`;
+
+const AdultDiv = styled.div`
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+`;
+
+const AdultImg = styled.img`
+    width: 1.6rem;
+    padding-left: 0.5rem;
 `;
 
 const rowVariants = {
@@ -306,11 +345,43 @@ const SliderComponent = ({ type }: { type: string }) => {
                                                 "original"
                                             )})`,
                                         }}
-                                    />
-                                    <BigTitle>{clickedMovie.title}</BigTitle>
-                                    <BigOverview>
-                                        {clickedMovie.overview}
-                                    </BigOverview>
+                                    >
+                                        <BigTitle>
+                                            {clickedMovie.title}
+                                        </BigTitle>
+                                    </BigCover>
+                                    <BottonBox>
+                                        <OpenDay>
+                                            개봉일 : {clickedMovie.release_date}
+                                        </OpenDay>
+                                        <Vote>
+                                            평점 :
+                                            <div
+                                                style={{
+                                                    color: "#4cd137",
+                                                    marginLeft: "0.5rem",
+                                                    fontWeight: 800,
+                                                    fontSize: "1.2rem",
+                                                }}
+                                            >
+                                                {clickedMovie.vote_average}
+                                            </div>
+                                        </Vote>
+                                        <AdultDiv>
+                                            청불 :{" "}
+                                            <AdultImg
+                                                src={
+                                                    clickedMovie.adult
+                                                        ? adultImg
+                                                        : notAdultImg
+                                                }
+                                                alt="adult"
+                                            />
+                                        </AdultDiv>
+                                        <BigOverview>
+                                            {clickedMovie.overview}
+                                        </BigOverview>
+                                    </BottonBox>
                                 </>
                             )}
                         </BigMovie>
