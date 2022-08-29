@@ -7,10 +7,10 @@ import {
     IoChevronBackCircleOutline,
     IoChevronForwardCircleOutline,
 } from "react-icons/io5";
-import { getMovies, IGetMoviesResult } from "../../api";
-import { makeImagePath } from "../../utils/Path";
-import adultImg from "../../img/adult.png";
-import notAdultImg from "../../img/All.png";
+import { getMovies, IGetMoviesResult } from "../../../api";
+import { makeImagePath } from "../../../utils/Path";
+import adultImg from "../../../img/adult.png";
+import notAdultImg from "../../../img/All.png";
 
 const SliderDiv = styled.div`
     position: relative;

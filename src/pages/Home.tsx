@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { getMovies, IGetMoviesResult, Types } from "../api";
-import SliderComponent from "../Component/Slide";
+import { getMovies, IGetMoviesResult } from "../api";
+import SliderComponent from "../Component/Slide/Movies";
 import { makeImagePath } from "../utils/Path";
 
 const Wrapper = styled.div`
     background-color: black;
-    overflow-x: hidden;
 `;
 
 const Loader = styled.div`
@@ -47,7 +46,7 @@ const offset = 6;
 const Home = () => {
     const { data, isLoading } = useQuery<IGetMoviesResult>(
         ["movies", "nowPlaying"],
-        () => getMovies(Types.now_playing)
+        () => getMovies("now_playing")
     );
 
     return (
