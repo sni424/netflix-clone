@@ -10,13 +10,14 @@ import {
 import { makeImagePath } from "../../../utils/Path";
 import { getTv, IGetTvResult } from "../../../api";
 
-const SliderDiv = styled.div`
+const SliderDiv = styled.div<{ margintop?: any }>`
     position: relative;
     top: -100px;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-top: ${(props) => props.margintop};
 `;
 
 const Button = styled.div<{ right?: string }>`
@@ -43,7 +44,9 @@ const Row = styled(motion.div)`
 
 const Box = styled(motion.div)<{ bgPhoto: string }>`
     background-color: white;
-    height: 200px;
+    width: 90%;
+    height: 400px;
+    border-radius: 0.5rem;
     font-size: 18px;
     background-image: url(${(props) => props.bgPhoto});
     background-position: center center;
@@ -128,7 +131,7 @@ const BigOverview = styled.p`
 
 const Category = styled.div`
     position: absolute;
-    margin-top: -20rem;
+    margin-top: -30rem;
     font-size: 2rem;
     font-weight: 800;
 `;
@@ -270,7 +273,7 @@ const TvSliderComponent = ({ type }: { type: string }) => {
 
     return (
         <>
-            <SliderDiv>
+            <SliderDiv margintop={type === "airing_today" ? "0" : "35rem"}>
                 <Category>{switchCategory()}</Category>
                 <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
                     <Button onClick={incraseIndex}>

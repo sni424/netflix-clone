@@ -6,7 +6,7 @@ import SliderComponent from "../Component/Slide/Movies";
 import { makeImagePath } from "../utils/Path";
 
 const Wrapper = styled.div`
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.1);
 `;
 
 const Loader = styled.div`
@@ -27,8 +27,8 @@ const Banner = styled.div<{ bgPhoto: string }>`
     background-size: cover;
 `;
 
-const MarginBottomDiv = styled.div`
-    margin-bottom: 25rem;
+const MarginiDiv = styled.div`
+    margin: 5rem 0 25rem 0;
 `;
 
 const Title = styled.h2`
@@ -67,9 +67,9 @@ const Home = () => {
                     {["now_playing", "popular", "top_rated", "upcoming"].map(
                         (category) => {
                             return (
-                                <MarginBottomDiv>
+                                <MarginiDiv>
                                     <SliderComponent type={category} />
-                                </MarginBottomDiv>
+                                </MarginiDiv>
                             );
                         }
                     )}
