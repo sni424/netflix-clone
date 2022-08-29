@@ -13,6 +13,15 @@ interface IMovie {
     vote_average: string;
     adult: boolean;
 }
+interface ITv {
+    id: number;
+    backdrop_path: string;
+    poster_path: string;
+    name: string;
+    overview: string;
+    first_air_date: string;
+    vote_average: string;
+}
 
 export interface IGetMoviesResult {
     dates: { maximum: string; minimum: string };
@@ -29,15 +38,21 @@ export interface IGetTopMoviesResult {
     total_results: number;
 }
 
+export interface IGetTvResult {
+    page: number;
+    results: ITv[];
+    total_pages: number;
+    total_results: number;
+}
+
 export const getMovies = async (type: string) => {
     return await axios
         .get(`${BASE_PATH}/movie/${type}?api_key=${API_KEY}`)
         .then((res) => res.data);
 };
 
-export enum Types {
-    "now_playing" = "now_playing",
-    "popular" = "popular",
-    "top_rated" = "top_rated",
-    "upcoming" = "upcoming",
-}
+export const getTv = async (type: string) => {
+    return await axios
+        .get(`${BASE_PATH}/tv/${type}?api_key=${API_KEY}`)
+        .then((res) => res.data);
+};
