@@ -5,7 +5,7 @@ import TvSliderComponent from "../Component/Slide/Tv/indesx";
 import { makeImagePath } from "../utils/Path";
 
 const Wrapper = styled.div`
-    background-color: black;
+    background-color: rgba(0, 0, 0, 0.1);
 `;
 
 const Loader = styled.div`
@@ -38,8 +38,8 @@ const Overview = styled.h3`
     width: 50%;
 `;
 
-const MarginBottomDiv = styled.div`
-    margin-bottom: 25rem;
+const MarginiDiv = styled.div`
+    margin: 5rem 0 25rem 0;
 `;
 
 const Tv = () => {
@@ -67,9 +67,9 @@ const Tv = () => {
                     {["airing_today", "popular", "top_rated", "on_the_air"].map(
                         (data) => {
                             return (
-                                <MarginBottomDiv>
+                                <MarginiDiv>
                                     <TvSliderComponent type={data} />
-                                </MarginBottomDiv>
+                                </MarginiDiv>
                             );
                         }
                     )}

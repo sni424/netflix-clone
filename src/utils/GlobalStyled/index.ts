@@ -54,7 +54,7 @@ body {
   font-weight: 300;
   color: ${(props) => props.theme.white.darker};
   line-height: 1.2;
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.95);
 }
 a{
   text-decoration: none;
