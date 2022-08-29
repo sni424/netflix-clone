@@ -1,6 +1,7 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { getTv, IGetTvResult } from "../api";
+import TvSliderComponent from "../Component/Slide/Tv/indesx";
 import { makeImagePath } from "../utils/Path";
 
 const Wrapper = styled.div`
@@ -67,7 +68,7 @@ const Tv = () => {
                         (data) => {
                             return (
                                 <MarginBottomDiv>
-                                    <h1>hello</h1>
+                                    <TvSliderComponent type={data} />
                                 </MarginBottomDiv>
                             );
                         }
