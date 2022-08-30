@@ -219,7 +219,6 @@ const SliderComponent = ({ type }: { type: string }) => {
         () => getMovies(type)
     );
     const navi = useNavigate();
-
     const [leaving, setLeaving] = useState(false);
     const [index, setIndex] = useState(0);
     const { scrollY } = useScroll();
@@ -248,7 +247,8 @@ const SliderComponent = ({ type }: { type: string }) => {
             if (leaving) return;
             toggleLeaving();
             const totalMovies = data?.results.length - 1;
-            setIndex((prev) => (prev === 0 ? 2 : prev - 1));
+            const maxIndex = Math.floor(totalMovies / offset) - 1;
+            setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
         }
     };
     const toggleLeaving = () => {
@@ -274,14 +274,12 @@ const SliderComponent = ({ type }: { type: string }) => {
             (movie) => String(movie.id) === bigMovieMatch.params.movieId
         );
 
-    console.log(clickedMovie);
-
     return (
         <>
             <SliderDiv margintop={type === "now_playing" ? "0" : "35rem"}>
                 <Category>{switchCategory()}</Category>
                 <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                    <Button onClick={incraseIndex}>
+                    <Button onClick={decraseIndex}>
                         <IoChevronBackCircleOutline size="100%" />
                     </Button>
                     <Row
@@ -322,7 +320,7 @@ const SliderComponent = ({ type }: { type: string }) => {
                                 );
                             })}
                     </Row>
-                    <Button onClick={decraseIndex} right="0">
+                    <Button onClick={incraseIndex} right="0">
                         <IoChevronForwardCircleOutline size="100%" />
                     </Button>
                 </AnimatePresence>

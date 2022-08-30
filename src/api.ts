@@ -56,3 +56,15 @@ export const getTv = async (type: string) => {
         .get(`${BASE_PATH}/tv/${type}?api_key=${API_KEY}`)
         .then((res) => res.data);
 };
+
+export const getSearchMovies = async (search: string) => {
+    return await axios
+        .get(`${BASE_PATH}/search/movie?api_key=${API_KEY}&query=${search}`)
+        .then((res) => res.data);
+};
+
+export const getSearchTv = async (search: string) => {
+    return await axios
+        .get(`${BASE_PATH}/search/tv?api_key=${API_KEY}&query=${search}`)
+        .then((res) => res.data);
+};
