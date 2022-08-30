@@ -7,8 +7,8 @@ import {
     IoChevronBackCircleOutline,
     IoChevronForwardCircleOutline,
 } from "react-icons/io5";
-import { makeImagePath } from "../../../utils/Path";
-import { getTv, IGetTvResult } from "../../../api";
+import { getSearchTv, IGetTvResult } from "../../../../api";
+import { makeImagePath } from "../../../../utils/Path";
 
 const SliderDiv = styled.div<{ margintop?: any }>`
     position: relative;
@@ -82,7 +82,7 @@ const Overlay = styled(motion.div)`
     opacity: 0;
     z-index: 1;
 `;
-const BigMovie = styled(motion.div)<{ scrollY: number }>`
+const BigTv = styled(motion.div)<{ scrollY: number }>`
     top: ${(props) => props.scrollY + 75}px;
     width: 40vw;
     height: 80vh;
@@ -118,16 +118,15 @@ const BigTitle = styled.h3`
 const BottonBox = styled.div`
     padding: 20px;
     margin: 0 auto;
-    height: 100%;
+    height: 30%;
+    overflow-y: auto;
 `;
 
 const BigOverview = styled.p`
     position: relative;
     color: ${(props) => props.theme.white.lighter};
     font-weight: 500;
-    height: 30%;
     font-size: 1.1rem;
-    overflow-y: auto;
 `;
 
 const Category = styled.div`
@@ -172,7 +171,7 @@ const BoxBariants = {
         transition: {
             delay: 0.5,
             duration: 0.3,
-            type: "tween",
+            search: "tween",
         },
     },
 };
@@ -182,7 +181,7 @@ const infoVariants = {
         transition: {
             delay: 0.5,
             duration: 0.3,
-            type: "tween",
+            search: "tween",
         },
         opacity: 1,
         backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -190,6 +189,7 @@ const infoVariants = {
 };
 
 const offset = 6;
+
 interface ITv {
     id: number;
     backdrop_path: string;
@@ -200,32 +200,31 @@ interface ITv {
     vote_average: string;
 }
 
-const TvSliderComponent = ({ type }: { type: string }) => {
-    const { data, isLoading } = useQuery<IGetTvResult>(["tv", type], () =>
-        getTv(type)
+const TvSearch = ({ search }: { search: string }) => {
+    const { data, isLoading } = useQuery<IGetTvResult>(["tv", search], () =>
+        getSearchTv(search)
     );
     const navi = useNavigate();
-
     const [leaving, setLeaving] = useState(false);
-    const [index, setIndex] = useState(0);
     const [moveBool, setMoveBool] = useState(false);
+    const [index, setIndex] = useState(0);
     const { scrollY } = useScroll();
 
-    const bigTvMatch = useMatch(`/tv/${type}/:tvId`);
+    const bigTvMatch = useMatch(`/search/tv/:tvId`);
 
-    const boxClicked = (category: string, movieId: number) => {
-        navi(`/tv/${category}/${movieId}`);
+    const boxClicked = (tvId: number) => {
+        navi(`/search/tv/${tvId}?category=tvs&keyword=${search}`);
     };
     const onOverlayClick = () => {
-        navi("/tv");
+        navi(`/search?keyword=${search}`);
     };
 
     const incraseIndex = () => {
         if (data) {
             if (leaving) return;
             toggleLeaving();
-            const totalTv = data?.results.length - 1;
-            const maxIndex = Math.floor(totalTv / offset) - 1;
+            const totalMovies = data?.results.length - 1;
+            const maxIndex = Math.floor(totalMovies / offset) - 1;
             setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
         }
     };
@@ -241,27 +240,16 @@ const TvSliderComponent = ({ type }: { type: string }) => {
         setLeaving(!leaving);
     };
 
-    const switchCategory = () => {
-        switch (type) {
-            case "popular":
-                return "인기있는 드라마";
-            case "top_rated":
-                return "모두가 극찬한 최고평점 드라마";
-            case "on_the_air":
-                return "현재 방송중";
-            default:
-                return "오늘 방송";
-        }
-    };
-
     const clickedTv =
         bigTvMatch?.params.tvId &&
-        data?.results.find((tv) => String(tv.id) === bigTvMatch.params.tvId);
+        data?.results.find(
+            (movie) => String(movie.id) === bigTvMatch.params.tvId
+        );
 
     return (
         <>
-            <SliderDiv margintop={type === "airing_today" ? "0" : "35rem"}>
-                <Category>{switchCategory()}</Category>
+            <SliderDiv margintop={"35rem"}>
+                <Category>Tv Search</Category>
                 <AnimatePresence
                     initial={false}
                     onExitComplete={toggleLeaving}
@@ -276,8 +264,8 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        transition={{ type: "tween", duration: 0.8 }}
-                        key={type + index}
+                        transition={{ search: "tween", duration: 0.8 }}
+                        key={search + index}
                     >
                         {data?.results
                             .slice(1)
@@ -285,10 +273,10 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                             .map((tv: ITv) => {
                                 return (
                                     <Box
-                                        layoutId={type + tv.id + ""}
-                                        onClick={() => boxClicked(type, tv.id)}
+                                        layoutId={search + tv.id + ""}
+                                        onClick={() => boxClicked(tv.id)}
                                         variants={BoxBariants}
-                                        key={type + tv.id}
+                                        key={search + tv.id}
                                         initial="normal"
                                         whileHover="hover"
                                         transition={{
@@ -319,9 +307,9 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                             exit={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                         />
-                        <BigMovie
+                        <BigTv
                             scrollY={scrollY.get()}
-                            layoutId={type + bigTvMatch.params.tvId}
+                            layoutId={search + bigTvMatch.params.tvId}
                         >
                             {clickedTv && (
                                 <>
@@ -360,7 +348,7 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                                     </BottonBox>
                                 </>
                             )}
-                        </BigMovie>
+                        </BigTv>
                     </>
                 ) : null}
             </AnimatePresence>
@@ -368,4 +356,4 @@ const TvSliderComponent = ({ type }: { type: string }) => {
     );
 };
 
-export default TvSliderComponent;
+export default TvSearch;

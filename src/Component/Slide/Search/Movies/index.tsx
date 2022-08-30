@@ -215,7 +215,7 @@ interface IMovie {
 
 const MovieSearch = ({ search }: { search: string }) => {
     const { data, isLoading } = useQuery<IGetMoviesResult>(
-        ["search", search],
+        ["movie", search],
         () => getSearchMovies(search)
     );
     const navi = useNavigate();
@@ -223,12 +223,10 @@ const MovieSearch = ({ search }: { search: string }) => {
     const [index, setIndex] = useState(0);
     const { scrollY } = useScroll();
 
-    const bigMovieMatch = useMatch(`/search/:searchId`);
+    const bigMovieMatch = useMatch(`/search/:movieId`);
 
-    console.log(bigMovieMatch);
-
-    const boxClicked = (searchId: number) => {
-        navi(`/search/${searchId}?keyword=${search}`);
+    const boxClicked = (movieId: number) => {
+        navi(`/search/${movieId}?category=movies&keyword=${search}`);
     };
     const onOverlayClick = () => {
         navi(`/search?keyword=${search}`);
@@ -256,12 +254,12 @@ const MovieSearch = ({ search }: { search: string }) => {
     };
 
     const clickedMovie =
-        bigMovieMatch?.params.searchId &&
+        bigMovieMatch?.params.movieId &&
         data?.results.find(
-            (movie) => String(movie.id) === bigMovieMatch.params.searchId
+            (movie) => String(movie.id) === bigMovieMatch.params.movieId
         );
 
-    console.log(clickedMovie, bigMovieMatch);
+    console.log(clickedMovie, bigMovieMatch?.params.movieId);
 
     return (
         <>
@@ -322,7 +320,7 @@ const MovieSearch = ({ search }: { search: string }) => {
                         />
                         <BigMovie
                             scrollY={scrollY.get()}
-                            layoutId={search + bigMovieMatch.params.searchId}
+                            layoutId={search + bigMovieMatch.params.movieId}
                         >
                             {clickedMovie && (
                                 <>
