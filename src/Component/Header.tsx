@@ -167,8 +167,9 @@ const Header = () => {
                 </Items>
             </Col>
             <Col right="10rem">
-                <Search onSubmit={handleSubmit(onValid)} onClick={openSearch}>
+                <Search onSubmit={handleSubmit(onValid)}>
                     <motion.svg
+                        onClick={openSearch}
                         animate={{
                             x: searchOpen ? -210 : 0,
                             transition: { duration: 0.5 },

@@ -7,8 +7,10 @@ import {
     IoChevronBackCircleOutline,
     IoChevronForwardCircleOutline,
 } from "react-icons/io5";
-import { makeImagePath } from "../../../utils/Path";
-import { getTv, IGetTvResult } from "../../../api";
+import { getMovies, getSearchMovies, IGetMoviesResult } from "../../../../api";
+import { makeImagePath } from "../../../../utils/Path";
+import adultImg from "../../../../img/adult.png";
+import notAdultImg from "../../../../img/All.png";
 
 const SliderDiv = styled.div<{ margintop?: any }>`
     position: relative;
@@ -118,7 +120,7 @@ const BigTitle = styled.h3`
 const BottonBox = styled.div`
     padding: 20px;
     margin: 0 auto;
-    height: 100%;
+    height: 30%;
     overflow-y: auto;
 `;
 
@@ -184,7 +186,7 @@ const BoxBariants = {
         transition: {
             delay: 0.5,
             duration: 0.3,
-            type: "tween",
+            search: "tween",
         },
     },
 };
@@ -194,7 +196,7 @@ const infoVariants = {
         transition: {
             delay: 0.5,
             duration: 0.3,
-            type: "tween",
+            search: "tween",
         },
         opacity: 1,
         backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -202,41 +204,42 @@ const infoVariants = {
 };
 
 const offset = 6;
-interface ITv {
+
+interface IMovie {
     id: number;
     backdrop_path: string;
     poster_path: string;
-    name: string;
+    title: string;
     overview: string;
-    first_air_date: string;
-    vote_average: string;
 }
 
-const TvSliderComponent = ({ type }: { type: string }) => {
-    const { data, isLoading } = useQuery<IGetTvResult>(["tv", type], () =>
-        getTv(type)
+const MovieSearch = ({ search }: { search: string }) => {
+    const { data, isLoading } = useQuery<IGetMoviesResult>(
+        ["search", search],
+        () => getSearchMovies(search)
     );
     const navi = useNavigate();
-
     const [leaving, setLeaving] = useState(false);
     const [index, setIndex] = useState(0);
     const { scrollY } = useScroll();
 
-    const bigTvMatch = useMatch(`/tv/${type}/:tvId`);
+    const bigMovieMatch = useMatch(`/search/:searchId`);
 
-    const boxClicked = (category: string, movieId: number) => {
-        navi(`/tv/${category}/${movieId}`);
+    console.log(bigMovieMatch);
+
+    const boxClicked = (searchId: number) => {
+        navi(`/search/${searchId}?keyword=${search}`);
     };
     const onOverlayClick = () => {
-        navi("/tv");
+        navi(`/search?keyword=${search}`);
     };
 
     const incraseIndex = () => {
         if (data) {
             if (leaving) return;
             toggleLeaving();
-            const totalTv = data?.results.length - 1;
-            const maxIndex = Math.floor(totalTv / offset) - 1;
+            const totalMovies = data?.results.length - 1;
+            const maxIndex = Math.floor(totalMovies / offset) - 1;
             setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
         }
     };
@@ -252,27 +255,18 @@ const TvSliderComponent = ({ type }: { type: string }) => {
         setLeaving(!leaving);
     };
 
-    const switchCategory = () => {
-        switch (type) {
-            case "popular":
-                return "인기있는 드라마";
-            case "top_rated":
-                return "모두가 극찬한 최고평점 드라마";
-            case "on_the_air":
-                return "현재 방송중";
-            default:
-                return "오늘 방송";
-        }
-    };
+    const clickedMovie =
+        bigMovieMatch?.params.searchId &&
+        data?.results.find(
+            (movie) => String(movie.id) === bigMovieMatch.params.searchId
+        );
 
-    const clickedTv =
-        bigTvMatch?.params.tvId &&
-        data?.results.find((tv) => String(tv.id) === bigTvMatch.params.tvId);
+    console.log(clickedMovie, bigMovieMatch);
 
     return (
         <>
-            <SliderDiv margintop={type === "airing_today" ? "0" : "35rem"}>
-                <Category>{switchCategory()}</Category>
+            <SliderDiv margintop={"35rem"}>
+                <Category>Moive Search</Category>
                 <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
                     <Button onClick={incraseIndex}>
                         <IoChevronBackCircleOutline size="100%" />
@@ -282,31 +276,32 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        transition={{ type: "tween", duration: 0.8 }}
-                        key={type + index}
+                        transition={{ search: "tween", duration: 0.8 }}
+                        key={search + index}
                     >
                         {data?.results
                             .slice(1)
                             .slice(offset * index, offset * index + offset)
-                            .map((tv: ITv) => {
+                            .map((movie: IMovie) => {
                                 return (
                                     <Box
-                                        layoutId={type + tv.id + ""}
-                                        onClick={() => boxClicked(type, tv.id)}
+                                        layoutId={search + movie.id + ""}
+                                        onClick={() => boxClicked(movie.id)}
                                         variants={BoxBariants}
-                                        key={type + tv.id}
+                                        key={movie.id}
                                         initial="normal"
                                         whileHover="hover"
                                         transition={{
-                                            type: "tween",
+                                            search: "tween",
                                         }}
                                         bgPhoto={makeImagePath(
-                                            tv.backdrop_path || tv.poster_path,
+                                            movie.backdrop_path ||
+                                                movie.poster_path,
                                             "original"
                                         )}
                                     >
                                         <InFo variants={infoVariants}>
-                                            <h4>{tv.name}</h4>
+                                            <h4>{movie.title}</h4>
                                         </InFo>
                                     </Box>
                                 );
@@ -318,7 +313,7 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                 </AnimatePresence>
             </SliderDiv>
             <AnimatePresence>
-                {bigTvMatch ? (
+                {bigMovieMatch ? (
                     <>
                         <Overlay
                             onClick={onOverlayClick}
@@ -327,25 +322,25 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                         />
                         <BigMovie
                             scrollY={scrollY.get()}
-                            layoutId={type + bigTvMatch.params.tvId}
+                            layoutId={search + bigMovieMatch.params.searchId}
                         >
-                            {clickedTv && (
+                            {clickedMovie && (
                                 <>
                                     <BigCover
                                         style={{
                                             backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                                                clickedTv.backdrop_path,
-                                                "original" ||
-                                                    clickedTv.poster_path
+                                                clickedMovie.backdrop_path,
+                                                "w500"
                                             )})`,
                                         }}
                                     >
-                                        <BigTitle>{clickedTv.name}</BigTitle>
+                                        <BigTitle>
+                                            {clickedMovie.title}
+                                        </BigTitle>
                                     </BigCover>
                                     <BottonBox>
                                         <OpenDay>
-                                            첫 방영 일자 :{" "}
-                                            {clickedTv.first_air_date}
+                                            개봉일 : {clickedMovie.release_date}
                                         </OpenDay>
                                         <Vote>
                                             평점 :
@@ -357,11 +352,22 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                                                     fontSize: "1.2rem",
                                                 }}
                                             >
-                                                {clickedTv.vote_average}
+                                                {clickedMovie.vote_average}
                                             </div>
                                         </Vote>
+                                        <AdultDiv>
+                                            청불 :{" "}
+                                            <AdultImg
+                                                src={
+                                                    clickedMovie.adult
+                                                        ? adultImg
+                                                        : notAdultImg
+                                                }
+                                                alt="adult"
+                                            />
+                                        </AdultDiv>
                                         <BigOverview>
-                                            {clickedTv.overview}
+                                            {clickedMovie.overview}
                                         </BigOverview>
                                     </BottonBox>
                                 </>
@@ -374,4 +380,4 @@ const TvSliderComponent = ({ type }: { type: string }) => {
     );
 };
 
-export default TvSliderComponent;
+export default MovieSearch;
