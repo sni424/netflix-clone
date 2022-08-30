@@ -9,6 +9,7 @@ import {
     IGetTvResult,
 } from "../api";
 import MovieSearch from "../Component/Slide/Search/Movies";
+import TvSearch from "../Component/Slide/Search/Tv";
 
 const Wrapper = styled.div`
     background-color: rgba(0, 0, 0, 0.1);
@@ -46,9 +47,14 @@ const Search = () => {
             {isLoading || tvLoading ? (
                 <Loader>Loading</Loader>
             ) : (
-                <MarginiDiv>
-                    <MovieSearch search={keyword || ""} />
-                </MarginiDiv>
+                <>
+                    <MarginiDiv>
+                        <MovieSearch search={keyword || ""} />
+                    </MarginiDiv>
+                    <MarginiDiv>
+                        <TvSearch search={keyword || ""} />
+                    </MarginiDiv>
+                </>
             )}
         </Wrapper>
     );
