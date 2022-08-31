@@ -222,6 +222,7 @@ const TvSearch = ({ search }: { search: string }) => {
     const incraseIndex = () => {
         if (data) {
             if (leaving) return;
+            setMoveBool(true);
             toggleLeaving();
             const totalMovies = data?.results.length - 1;
             const maxIndex = Math.floor(totalMovies / offset) - 1;
@@ -232,8 +233,11 @@ const TvSearch = ({ search }: { search: string }) => {
     const decraseIndex = () => {
         if (data) {
             if (leaving) return;
+            setMoveBool(false);
             toggleLeaving();
-            setIndex((prev) => (prev === 0 ? 2 : prev - 1));
+            const totalMovies = data?.results.length - 1;
+            const maxIndex = Math.floor(totalMovies / offset) - 1;
+            setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
         }
     };
     const toggleLeaving = () => {
@@ -246,6 +250,8 @@ const TvSearch = ({ search }: { search: string }) => {
             (movie) => String(movie.id) === bigTvMatch.params.tvId
         );
 
+    console.log(data);
+
     return (
         <>
             <SliderDiv margintop={"35rem"}>
@@ -255,7 +261,7 @@ const TvSearch = ({ search }: { search: string }) => {
                     onExitComplete={toggleLeaving}
                     custom={moveBool}
                 >
-                    <Button onClick={incraseIndex}>
+                    <Button onClick={decraseIndex}>
                         <IoChevronBackCircleOutline size="100%" />
                     </Button>
                     <Row
@@ -283,8 +289,8 @@ const TvSearch = ({ search }: { search: string }) => {
                                             type: "tween",
                                         }}
                                         bgPhoto={makeImagePath(
-                                            tv.backdrop_path || tv.poster_path,
-                                            "original"
+                                            tv.poster_path,
+                                            "original" || tv.backdrop_path
                                         )}
                                     >
                                         <InFo variants={infoVariants}>
@@ -294,7 +300,7 @@ const TvSearch = ({ search }: { search: string }) => {
                                 );
                             })}
                     </Row>
-                    <Button onClick={decraseIndex} right="0">
+                    <Button onClick={incraseIndex} right="0">
                         <IoChevronForwardCircleOutline size="100%" />
                     </Button>
                 </AnimatePresence>

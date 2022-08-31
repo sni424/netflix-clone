@@ -166,15 +166,15 @@ const AdultImg = styled.img`
 `;
 
 const rowVariants = {
-    hidden: {
-        x: window.outerWidth + 5,
-    },
+    hidden: (moveBool: boolean) => ({
+        x: moveBool ? window.outerWidth + 5 : -window.outerWidth - 5,
+    }),
     visible: {
         x: 0,
     },
-    exit: {
-        x: -window.outerWidth - 5,
-    },
+    exit: (moveBool: boolean) => ({
+        x: moveBool ? -window.outerWidth - 5 : window.outerWidth + 5,
+    }),
 };
 const BoxBariants = {
     normal: {
@@ -221,6 +221,7 @@ const MovieSearch = ({ search }: { search: string }) => {
     const navi = useNavigate();
     const [leaving, setLeaving] = useState(false);
     const [index, setIndex] = useState(0);
+    const [moveBool, setMoveBool] = useState(false);
     const { scrollY } = useScroll();
 
     const bigMovieMatch = useMatch(`/search/:movieId`);
@@ -235,6 +236,7 @@ const MovieSearch = ({ search }: { search: string }) => {
     const incraseIndex = () => {
         if (data) {
             if (leaving) return;
+            setMoveBool(true);
             toggleLeaving();
             const totalMovies = data?.results.length - 1;
             const maxIndex = Math.floor(totalMovies / offset) - 1;
@@ -245,8 +247,11 @@ const MovieSearch = ({ search }: { search: string }) => {
     const decraseIndex = () => {
         if (data) {
             if (leaving) return;
+            setMoveBool(false);
             toggleLeaving();
-            setIndex((prev) => (prev === 0 ? 2 : prev - 1));
+            const totalMovies = data?.results.length - 1;
+            const maxIndex = Math.floor(totalMovies / offset) - 1;
+            setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
         }
     };
     const toggleLeaving = () => {
@@ -265,11 +270,16 @@ const MovieSearch = ({ search }: { search: string }) => {
         <>
             <SliderDiv margintop={"35rem"}>
                 <Category>Moive Search</Category>
-                <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                    <Button onClick={incraseIndex}>
+                <AnimatePresence
+                    initial={false}
+                    onExitComplete={toggleLeaving}
+                    custom={moveBool}
+                >
+                    <Button onClick={decraseIndex}>
                         <IoChevronBackCircleOutline size="100%" />
                     </Button>
                     <Row
+                        custom={moveBool}
                         variants={rowVariants}
                         initial="hidden"
                         animate="visible"
@@ -305,7 +315,7 @@ const MovieSearch = ({ search }: { search: string }) => {
                                 );
                             })}
                     </Row>
-                    <Button onClick={decraseIndex} right="0">
+                    <Button onClick={incraseIndex} right="0">
                         <IoChevronForwardCircleOutline size="100%" />
                     </Button>
                 </AnimatePresence>
