@@ -157,7 +157,7 @@ const Header = () => {
                 </Logo>
                 <Items>
                     <Item>
-                        <Link to="/">Home</Link>
+                        <Link to="/netflix-clone">Home</Link>
                         {homeMatch?.pattern.end && <Circle layoutId="circle" />}
                     </Item>
                     <Item>
