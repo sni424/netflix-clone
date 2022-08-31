@@ -9,7 +9,7 @@ function App() {
         <>
             <Header />
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/netflix-clone" element={<Home />} />
                 <Route path="movies/:category/:movieId" element={<Home />} />
                 <Route path="tv" element={<Tv />}>
                     <Route path=":category/:tvId" element={<Tv />} />

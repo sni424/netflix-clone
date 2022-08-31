@@ -230,7 +230,7 @@ const SliderComponent = ({ type }: { type: string }) => {
         navi(`/movies/${category}/${movieId}`);
     };
     const onOverlayClick = () => {
-        navi("/");
+        navi("/netflix-clone");
     };
 
     const incraseIndex = () => {

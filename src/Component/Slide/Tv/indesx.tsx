@@ -234,7 +234,9 @@ const TvSliderComponent = ({ type }: { type: string }) => {
         if (data) {
             if (leaving) return;
             toggleLeaving();
-            setIndex((prev) => (prev === 0 ? 2 : prev - 1));
+            const totalTv = data?.results.length - 1;
+            const maxIndex = Math.floor(totalTv / offset) - 1;
+            setIndex((prev) => (prev === 0 ? maxIndex - 1 : prev - 1));
         }
     };
     const toggleLeaving = () => {
@@ -267,7 +269,7 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                     onExitComplete={toggleLeaving}
                     custom={moveBool}
                 >
-                    <Button onClick={incraseIndex}>
+                    <Button onClick={decraseIndex}>
                         <IoChevronBackCircleOutline size="100%" />
                     </Button>
                     <Row
@@ -306,7 +308,7 @@ const TvSliderComponent = ({ type }: { type: string }) => {
                                 );
                             })}
                     </Row>
-                    <Button onClick={decraseIndex} right="0">
+                    <Button onClick={incraseIndex} right="0">
                         <IoChevronForwardCircleOutline size="100%" />
                     </Button>
                 </AnimatePresence>
