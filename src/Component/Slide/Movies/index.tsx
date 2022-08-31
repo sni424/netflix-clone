@@ -224,7 +224,7 @@ const SliderComponent = ({ type }: { type: string }) => {
     const [moveBool, setMoveBool] = useState(false);
     const { scrollY } = useScroll();
 
-    const bigMovieMatch = useMatch(`/movies/${type}/:movieId`);
+    const bigMovieMatch = useMatch(`netflix-clone/movies/${type}/:movieId`);
 
     const boxClicked = (category: string, movieId: number) => {
         navi(`/movies/${category}/${movieId}`);

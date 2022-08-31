@@ -109,7 +109,7 @@ interface IForm {
 
 const Header = () => {
     const [searchOpen, setSearchOpen] = useState(false);
-    const homeMatch = useMatch("/");
+    const homeMatch = useMatch("/netflix-clone");
     const tvMatch = useMatch("tv");
     const inputAnimation = useAnimation();
     const { scrollY } = useScroll();
